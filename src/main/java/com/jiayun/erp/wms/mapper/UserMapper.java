@@ -19,8 +19,10 @@ public interface UserMapper extends BaseMapper<User> {
     User getUserWithRoles(@Param("userId") int userId);
 
     User getUserWithRolesByPhone(@Param("phone") String phone);
+    //用户认证鉴权时调用(含登录密码)
+    User getUserAuthByPhone(@Param("phone") String phone);
 
-    @Insert("insert into users values (#{id}, #{name}, #{title}, #{phone}, #{salt}, #{pwd}, #{createDate}, #{updateDate}, #{deleteDate})")
+    @Insert("insert into users values (#{id}, #{name}, #{title}, #{phone}, #{pwd}, #{createDate}, #{updateDate}, #{deleteDate})")
     int createUser(User user);
 
     @Insert("insert into user_roles (user_id, role_id) values (#{userId}, #{roleId})")

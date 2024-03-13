@@ -42,16 +42,18 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
         // 判断是否正确解析
         // 判断是否过期
 
-        // 若使用JWT方式 则还需设置登录认证后的实体
+
+
+        // 若使用纯JWT方式(无redis/session) 则还需设置登录认证后的实体 以便本次请求的后续业务逻辑处理使用
+        System.out.println("X-Token: " + token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(token);
         if(userDetails == null){
             response.getWriter().write(Res.write(50000, "当前用户不存在", null));
             return;
         }
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities()
+                userDetails, userDetails.getPassword(), userDetails.getAuthorities()
         );
-        //设置认证后的实体 以便本次请求的后续业务逻辑处理使用
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);

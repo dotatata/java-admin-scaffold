@@ -15,6 +15,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -27,6 +28,8 @@ public class UserController {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Order(1)
     @ApiOperation(value = "获取用户列表(分页)")
@@ -37,7 +40,7 @@ public class UserController {
                         @ApiImplicitParam(name = "limit", value = "每页数据条数", required = false),
                         @ApiImplicitParam(name = "sort", value = "排序字段", required = false),
                         @ApiImplicitParam(name = "rank", value = "排序顺序规则ASC|DESC", required = false, allowableValues="ASC|DESC")})
-    @PreAuthorize("hasAnyAuthority('user:get-list')")
+    @PreAuthorize("hasAnyAuthority('user:read')")
     @GetMapping("/users")
     public ResponseEntity<Res> getUserList(@RequestParam(required = false) Optional<String> name,
                                            @RequestParam(required = false) Optional<String> title,
@@ -69,7 +72,7 @@ public class UserController {
 
     @Order(2)
     @ApiOperation(value = "获取所有用户列表")
-    @PreAuthorize("hasAnyAuthority('user:get-all')")
+    @PreAuthorize("hasAnyAuthority('user:read')")
     @GetMapping("/user/get-all")
     public ArrayList<User> getAllUserList() {
         return userMapper.getAllUserList();
@@ -78,7 +81,7 @@ public class UserController {
     @Order(3)
     @ApiOperation(value = "获取用户详情")
     @ApiImplicitParams({@ApiImplicitParam(name = "userId", value = "用户ID", required = true)})
-    @PreAuthorize("hasAnyAuthority('user:get')")
+    @PreAuthorize("hasAnyAuthority('user:read')")
     @GetMapping("/user/{userId}")
     public User getUserById(@PathVariable int userId){
         System.out.println("get user by id " + userId);
@@ -126,15 +129,15 @@ public class UserController {
         if (user.getPwd() == null) {
             user.setPwd("ooxxooxx");
         }
-        if (user.getSalt() == null) {
-            user.setSalt("9effaa");
-        }
+        user.setPwd(passwordEncoder.encode(user.getPwd()));
+
         //TODO 添加数据库事务
         int created = userMapper.insert(user);
 
         //创建关联关系
         if(created == 1){
             int[] roleIds = user.getRoleIds();
+            //TODO userMapper中增加一次insert多条数据的方法 避免循环
             for (int roleId : roleIds){
                 int res = userMapper.createUserRoles(user.getId(), roleId);
             }
@@ -162,6 +165,7 @@ public class UserController {
             int deleteCnt = userMapper.deleteUserRolesByUserId(user.getId());
             //创建新角色关系
             int[] roleIds = user.getRoleIds();
+            //TODO userMapper中增加一次insert多条数据的方法 避免循环
             for (int roleId : roleIds){
                 int res = userMapper.createUserRoles(user.getId(), roleId);
             }

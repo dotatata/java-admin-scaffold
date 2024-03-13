@@ -47,15 +47,21 @@ public class Res {
     public static ResponseEntity<Res> ok(String message, Object data){
         //TODO code枚举改造
         Res res = new Res(20000, message, data);
-        //ResponseEntity.
         return ResponseEntity.ok(res);
+    }
+
+    public static ResponseEntity<Res> ok(String message){
+        return ok(message, null);
     }
 
     public static ResponseEntity<Res> error(String message, Object data){
         //TODO code枚举改造
         Res res = new Res(50000, message, data);
-        //ResponseEntity.
         return ResponseEntity.ok(res);
+    }
+
+    public static ResponseEntity<Res> error(String message){
+        return error(message, null);
     }
 
 

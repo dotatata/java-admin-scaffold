@@ -17,53 +17,54 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-@ApiModel("用户")
-@TableName("users")
-public class User {
+@ApiModel("数据权限测试表")
+@TableName("data_permission_test")
+public class DataPermissionTest {
 
-    @ApiModelProperty(value = "用户ID", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(value = "ID", accessMode = ApiModelProperty.AccessMode.READ_ONLY)
     @TableId(type = IdType.AUTO)    //如果使用BaseMapper.insert(T entity)则可以直接更新新插入的主键ID
     private Integer id;
 
-    @ApiModelProperty(value = "姓名")
-    private String name;
+    @ApiModelProperty(value = "业务内容")
+    private String context;
 
-    @ApiModelProperty(value = "岗位")
-    private String title;
+    @ApiModelProperty(value = "业务描述")
+    private String desc;
 
-    @ApiModelProperty(value = "电话")
-    private String phone;
+    @ApiModelProperty(value = "部门ID")
+    private String deptId;
 
-    @ApiModelProperty(value = "密码", hidden = true)
-    private String pwd;
+    @ApiModelProperty(value = "用户ID/员工ID")
+    private String userId;
 
     @ApiModelProperty(value = "创建日期", hidden = true, position = 8)
     private Timestamp createDate;
+    @ApiModelProperty(value = "创建用户ID/创建员工ID")
+    private String createId;
 
     @ApiModelProperty(value = "更新日期", hidden = true, position = 9)
     private Timestamp updateDate;
+    @ApiModelProperty(value = "更新用户ID/更新员工ID")
+    private String updateId;
 
     @ApiModelProperty(value = "删除日期", hidden = true, position = 10)
     private Timestamp deleteDate;
+    @ApiModelProperty(value = "删除用户ID/删除员工ID")
+    private String deleteId;
 
-    @TableField(exist = false)
-    private List<Role> roles;
 
-    @TableField(exist = false)
-    private int[] roleIds;      //接收创建用户请求时的角色ID
+    public DataPermissionTest(){}
 
-    public User(){}
-
-    public User(String name, String title, String phone, String pwd, int[] roleIds) {
-        this.name = name;
-        this.title = title;
-        this.phone = phone;
-        this.pwd = pwd;
-        this.roleIds = roleIds;
-    }
-
-    public boolean checkSuperAdmin(){
-        return roles.stream().anyMatch(role -> role.getRoleKey().equals("super-admin"));
+    public DataPermissionTest(String context, String deptId, String userId, Timestamp createDate, String createId, Timestamp updateDate, String updateId, Timestamp deleteDate, String deleteId) {
+        this.context = context;
+        this.deptId = deptId;
+        this.userId = userId;
+        this.createDate = createDate;
+        this.createId = createId;
+        this.updateDate = updateDate;
+        this.updateId = updateId;
+        this.deleteDate = deleteDate;
+        this.deleteId = deleteId;
     }
 
     public String getCreateDate() {

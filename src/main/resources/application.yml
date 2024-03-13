@@ -14,3 +14,8 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   mapper-locations: classpath*:mapper/*.xml  #指定Mybatis的Mapper文件
   type-aliases-package: com.jiayun.erp.wms.mybatis.entity #指定Mybatis的实体目录
+
+#认证token有效期(token缓存有效期) 单位：S
+auth-token-expiration: 7 * 24 * 60 * 60
+#缓存有效期
+cache-expiration: 1 * 24 * 60 * 60

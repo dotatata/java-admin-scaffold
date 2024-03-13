@@ -20,6 +20,10 @@
         SELECT id, `name`, title, phone, create_date, update_date FROM users WHERE phone = #{phone}
     </select>
 
+    <select id="getUserAuthByPhone" parameterType="String" resultMap="userResultMap">
+        SELECT id, `name`, title, phone, pwd, create_date, update_date FROM users WHERE phone = #{phone}
+    </select>
+
     <select id="getRoleByUserId" parameterType="int" resultType="com.jiayun.erp.wms.entity.Role">
         SELECT r.*
         FROM user_roles ur

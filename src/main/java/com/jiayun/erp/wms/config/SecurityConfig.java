@@ -10,14 +10,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -37,6 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     AuthenticationTokenFilter authenticationTokenFilter;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    UserDetailsService userDetailsService;
 
     @Bean
     @Override
@@ -49,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 禁用SpringSecurity的默认登录认证
         //super.configure(http);
 
-        http.cors().and()       // 开启跨域
+        http.cors().and()           // 开启跨域
                 .csrf().disable();  // 禁用CSRF保护
         // 根据请求的URL进行权限控制
         http.authorizeRequests()
@@ -69,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //.antMatchers(HttpMethod.GET, "/users").hasAnyRole("admin", "test")
                 .anyRequest().authenticated();                  // 其他请求需要认证
 
-        http.formLogin()
+        http.formLogin();
                 //.loginPage("/login.html")           // 登录页面URL 前后端分离不需要配置该项
                 //.loginProcessingUrl("/login")       // 登录请求处理URL
                 //.usernameParameter("username")      // 登录请求中的账号参数名称
@@ -77,18 +81,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //.defaultSuccessUrl("/dashboard")    // 登录成功后的默认跳转页面 前后端分离不需要配置该项
                 //.failureForwardUrl("/login")        // 登录失败后的默认跳转页面 前后端分离不需要配置该项
                 // 登录成功处理逻辑 使用匿名内部类 和defaultSuccessUrl同时配置时 后配置的项覆盖前配置的项
-                .successHandler((httpServletRequest, httpServletResponse, authentication) -> {
-                    httpServletResponse.setContentType("application/json;charset=utf-8");
-                    httpServletResponse.getWriter().write(Res.write(20000, "登录成功了~~", null));
-                })
+                //.successHandler((httpServletRequest, httpServletResponse, authentication) -> {
+                //    httpServletResponse.setContentType("application/json;charset=utf-8");
+                //    httpServletResponse.getWriter().write(Res.write(20000, "登录成功了~~", null));
+                //})
                 // 登录失败处理逻辑 使用匿名内部类 和defaultSuccessUrl同时配置时 后配置的项覆盖前配置的项
-                .failureHandler((request, response, exception) -> {
-                    response.setContentType("application/json;charset=utf-8");
-                    response.getWriter().write(Res.write(50000, "登录失败了!!", exception.getMessage()));
-                });
+                //.failureHandler((request, response, exception) -> {
+                //    response.setContentType("application/json;charset=utf-8");
+                //    response.getWriter().write(Res.write(50000, "登录失败了!!", exception.getMessage()));
+                //});
 
         http.logout()
-                .logoutUrl("/auth/logout")
+                //.logoutUrl("/auth/logout")
                 //.logoutSuccessUrl("/login")   // 登出成功后的默认跳转页面 前后端分离不需要配置该项
                 .logoutSuccessHandler((request, response, authentication) -> {
                     //TODO 删除Redis缓存等处理
@@ -116,35 +120,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     // SpringSecurity获取用户信息
-    @Bean
-    @Override
-    public UserDetailsService userDetailsService(){
-        // 基于内存方式的用户信息
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(
-                User.withUsername("13888888888")
-                    .password("ooxxooxx")
-                    .roles("admin", "test")
-                    .authorities("user:create", "user:delete", "user:update", "user:get-list")
-                    .build());
+    //@Bean
+    //@Override
+    //public UserDetailsService userDetailsService(){
+    //    // 基于内存方式的用户信息
+    //    InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+    //    manager.createUser(
+    //            User.withUsername("13888888888")
+    //                .password("ooxxooxx")
+    //                .roles("admin", "test")
+    //                .authorities("user:create", "user:delete", "user:update", "user:get-list")
+    //                .build());
+    //
+    //    return manager;
+    //}
 
-        return manager;
-    }
-
+    // 密码加密器
     @Bean
     public PasswordEncoder passwordEncoder(){
-        // 密码加密器(明文加密器，不能用于生产)
-        return NoOpPasswordEncoder.getInstance();
+        // 明文加密器，不能用于生产
+        //return NoOpPasswordEncoder.getInstance();
+        // BlowFish加密算法 可以通过调整工作因子(work factor)来平衡加密速度和安全性 默认工作因子为10 意味着进行2^10次哈希运算
+        return new BCryptPasswordEncoder();
+        // 基于密码、盐（salt）和迭代次数
+        //return new Pbkdf2PasswordEncoder();
     }
 
-    //@Bean
-    //public CorsConfigurationSource corsConfigurationSource() {
-    //    CorsConfiguration configuration = new CorsConfiguration();
-    //    configuration.setAllowedOrigins(Arrays.asList("*")); // 允许所有来源
-    //    configuration.setAllowedMethods(Arrays.asList("GET","POST")); // 允许GET和POST方法
-    //    // 可以添加更多的配置，如允许的头部、是否允许凭证等
-    //    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    //    source.registerCorsConfiguration("/**", configuration); // 对所有路径应用CORS配置
-    //    return source;
-    //}
+    // 密码认证的加密规则
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
 }
