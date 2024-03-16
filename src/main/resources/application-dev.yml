@@ -10,10 +10,10 @@ spring:
       enabled: false  #开发环境热部署
       additional-paths: src/main/java
       exclude: static/**
-  mvc:
+  #mvc:
     #static-path-pattern: /** #指定前端访问后台静态资源的位置，默认为/**，需要前端增加路径时，如localhost/img/1.jpg，则配置为/img/**
-  web:
-    resources:
+  #web:
+    #resources:
       #static-locations: classpath:/static/  #指定其他静态资源位置
   servlet:
     multipart:
