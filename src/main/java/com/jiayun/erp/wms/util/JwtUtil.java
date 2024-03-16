@@ -41,7 +41,7 @@ public class JwtUtil {
         return decodedToken.getClaim(key).asString();
     }
 
-    public static DecodedJWT getDecodedJwt(String token){
+    public static DecodedJWT getDecodedToken(String token){
         // 验证签名
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret)).build();
         return verifier.verify(token);
@@ -54,7 +54,8 @@ public class JwtUtil {
     //    return decodedToken.getPayload();
     //}
 
-    public static boolean isExpired(String token){
+    // 加密有效 & 未超时
+    public static boolean isValidate(String token){
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(secret)).build();
         try{
             DecodedJWT decodedToken = verifier.verify(token);

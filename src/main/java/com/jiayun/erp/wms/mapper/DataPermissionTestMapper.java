@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jiayun.erp.wms.entity.DataPermissionTest;
 import com.jiayun.erp.wms.entity.User;
 import com.jiayun.erp.wms.util.DataPermission;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.ArrayList;
 
+@Mapper
 public interface DataPermissionTestMapper extends BaseMapper<DataPermissionTest> {
 
     @Select("select * from data_permission_test where `desc` = #{desc}")

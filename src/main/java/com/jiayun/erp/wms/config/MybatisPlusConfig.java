@@ -4,15 +4,12 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.handler.DataPermissionHandler;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
-import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.jiayun.erp.wms.util.CurrentThread;
 import lombok.SneakyThrows;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +37,7 @@ public class MybatisPlusConfig {
             @Override
             public Expression getTenantId() {
                 //System.out.println("CurrentThread.currentUser: " + CurrentThread.currentUser().getUserId());
-                System.out.println("CurrentThread.currentUser: " + CurrentThread.currentUser().getUsername());
+                System.out.println("CurrentThread.currentUser: " + CurrentThread.currentUserBySecurityFilter().getUsername());
                 //TODO 先写死租户ID测试
                 return new LongValue(2);
             }

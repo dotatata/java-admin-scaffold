@@ -6,10 +6,13 @@ import com.jiayun.erp.wms.entity.User;
 import com.jiayun.erp.wms.mapper.AuthMapper;
 import com.jiayun.erp.wms.mapper.PermissionMapper;
 import com.jiayun.erp.wms.mapper.UserMapper;
+import com.jiayun.erp.wms.util.JwtUtil;
+import com.jiayun.erp.wms.util.RedisUtil;
 import com.jiayun.erp.wms.util.Res;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -40,24 +43,41 @@ public class AuthController {
     private PermissionMapper permissionMapper;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Order(1)
     @ApiOperation(value = "登录")
     @ApiImplicitParams({@ApiImplicitParam(name = "username", value = "用户名", required = true),
                         @ApiImplicitParam(name = "password", value = "密码", required = true)})
     @PostMapping("/auth/login")
-    public ResponseEntity<Res> login(@RequestBody Map<String, String> tokenPair) {
+    public ResponseEntity<Res> login(@NotNull @RequestBody Map<String, String> tokenPair) {
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(tokenPair.get("username"), tokenPair.get("password"));
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(tokenPair.get("username"), tokenPair.get("password"));
         try{
-            Authentication authentication = authenticationManager.authenticate(token);
+            Authentication authentication = authenticationManager.authenticate(authToken);
             if (authentication != null && authentication.isAuthenticated()){
                 Map<String, String> data = new HashMap<>();
                 //User user = (User)authentication.getPrincipal();
                 User user = authMapper.getUserByPhone(tokenPair.get("username"));
+
+                Map<String, String> userMap = new HashMap<>();
+                userMap.put("uid", user.getId().toString());
+                userMap.put("phone", user.getPhone());
+                userMap.put("name", user.getName());
+                userMap.put("roles", user.getRoles().toString());
+
+                String token = JwtUtil.createTokenByMap(userMap);
+                // 返回认证token 后续访问从header中的"X-token"中获取认证
+                data.put("token", token);
+
                 //TODO 暂时使用userId替代vue-element-admin使用的token
-                data.put("token", user.getPhone());
-                //TODO 设置Redis缓存
+                //data.put("token", user.getPhone());
+
+                // 设置Redis缓存
+                redisUtil.set("user:"+user.getId(), user);
+
+
                 return Res.ok("登录成功~~", data);
             }
         }catch (BadCredentialsException e){

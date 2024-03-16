@@ -4,6 +4,8 @@ import com.jiayun.erp.wms.entity.DataPermissionTest;
 import com.jiayun.erp.wms.entity.User;
 import com.jiayun.erp.wms.mapper.DataPermissionTestMapper;
 import com.jiayun.erp.wms.mapper.TestMapper;
+import com.jiayun.erp.wms.util.CurrentThread;
+import com.jiayun.erp.wms.util.RedisUtil;
 import com.jiayun.erp.wms.util.Res;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,8 @@ public class TestController {
     TestMapper testMapper;
     @Autowired
     DataPermissionTestMapper dataPermissionTestMapper;
+    @Autowired
+    CurrentThread currentThread;
 
     @GetMapping("/test")
     public ResponseEntity<String> testAction(){
@@ -30,5 +34,11 @@ public class TestController {
     public ResponseEntity<Res> testDataPermission() {
         List<DataPermissionTest> dataPermissionTests = dataPermissionTestMapper.getAllList("desc test");
         return Res.ok("success", dataPermissionTests);
+    }
+
+    @GetMapping("/token-test")
+    public ResponseEntity<Res> testTokenAction(){
+        System.out.println("get AuthUser from redis: " + currentThread.currentUserByRedis());
+        return Res.ok("success", null);
     }
 }

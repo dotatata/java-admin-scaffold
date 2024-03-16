@@ -1,11 +1,7 @@
 package com.jiayun.erp.wms;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jiayun.erp.wms.entity.User;
-import com.jiayun.erp.wms.mapper.AuthMapper;
 import com.jiayun.erp.wms.mapper.UserMapper;
 import com.jiayun.erp.wms.util.JwtUtil;
 import com.jiayun.erp.wms.util.RedisUtil;
@@ -60,7 +56,7 @@ class WmsApplicationTests {
 
 
         System.out.println("==========decode token==========");
-        DecodedJWT decodedToken = JwtUtil.getDecodedJwt(token);
+        DecodedJWT decodedToken = JwtUtil.getDecodedToken(token);
         System.out.println("decodedToken: " + decodedToken);
         System.out.println("getHeader: " + decodedToken.getHeader());
         System.out.println("getPayload: " + decodedToken.getPayload());

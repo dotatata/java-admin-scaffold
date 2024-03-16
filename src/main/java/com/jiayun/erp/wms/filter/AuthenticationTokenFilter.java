@@ -1,6 +1,8 @@
 package com.jiayun.erp.wms.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jiayun.erp.wms.util.JwtUtil;
+import com.jiayun.erp.wms.util.RedisUtil;
 import com.jiayun.erp.wms.util.Res;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +25,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -39,22 +43,21 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
             response.getWriter().write(Res.write(50000, "token不能为空", null));
             return;
         }
-        // 判断是否正确解析
-        // 判断是否过期
+        // 校验JWT token是否有效(secret & expired)
+        JwtUtil.isValidate(token);
 
-
+        System.out.println("X-Token: " + token);
 
         // 若使用纯JWT方式(无redis/session) 则还需设置登录认证后的实体 以便本次请求的后续业务逻辑处理使用
-        System.out.println("X-Token: " + token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(token);
-        if(userDetails == null){
-            response.getWriter().write(Res.write(50000, "当前用户不存在", null));
-            return;
-        }
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, userDetails.getPassword(), userDetails.getAuthorities()
-        );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        //UserDetails userDetails = userDetailsService.loadUserByUsername(token);
+        //if(userDetails == null){
+        //    response.getWriter().write(Res.write(50000, "当前用户不存在", null));
+        //    return;
+        //}
+        //UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+        //        userDetails, userDetails.getPassword(), userDetails.getAuthorities()
+        //);
+        //SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
     }
