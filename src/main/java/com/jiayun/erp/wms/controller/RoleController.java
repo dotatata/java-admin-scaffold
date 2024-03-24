@@ -1,32 +1,29 @@
 package com.jiayun.erp.wms.controller;
 
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.jiayun.erp.wms.entity.Role;
-import com.jiayun.erp.wms.entity.User;
 import com.jiayun.erp.wms.mapper.RoleMapper;
 import com.jiayun.erp.wms.util.Res;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 @Api(value = "角色管理控制器")
 @RestController
+@RequiredArgsConstructor
 public class RoleController {
 
-    @Autowired
-    private RoleMapper roleMapper;
+    private final RoleMapper roleMapper;
 
     @Order(1)
     @ApiOperation(value = "获取角色列表(分页)")
@@ -39,7 +36,7 @@ public class RoleController {
         int pageQuantity = pageSize.filter(n -> n > 0 && n < 50).orElse(20);
         Page<Role> page = new Page<>(pageNum, pageQuantity);
 
-        QueryWrapper<Role> queryWrapper = new QueryWrapper<Role>();
+        QueryWrapper<Role> queryWrapper = new QueryWrapper<>();
         queryWrapper.isNull("delete_date");
 
         return Res.ok("success", roleMapper.selectPage(page, queryWrapper));

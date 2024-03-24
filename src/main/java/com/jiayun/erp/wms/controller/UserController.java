@@ -2,7 +2,6 @@ package com.jiayun.erp.wms.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jiayun.erp.wms.entity.Role;
 import com.jiayun.erp.wms.entity.User;
 import com.jiayun.erp.wms.mapper.UserMapper;
 import com.jiayun.erp.wms.util.Res;
@@ -10,7 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +19,14 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Api(value = "用户控制器")
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Order(1)
     @ApiOperation(value = "获取用户列表(分页)")

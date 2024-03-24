@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+<!--    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>-->
+
+    <!-- 定义变量，用于在多个appender中共享 日志路径在application.yml中配置 -->
+    <!-- ${LOG_PATH}默认获取application.yml中的logging.file.path值; 下面value中的:-表示默认值   -->
+    <property name="LOG_PATH" value="${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/logs}}/}"/>
+    <!-- ${LOG_FILE}默认获取application.yml中的logging.file.name值;   -->
+    <property name="LOG_FILE" value="${LOG_FILE:-app.log}"/>
+    <property name="LOG_ARCHIVE" value="${LOG_PATH}/archive"/>
+
+    <!-- 定义通用的日志格式 -->
+    <!--<property name="FILE_LOG_PATTERN"-->
+    <!--          value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} : %msg%n"/>-->
+
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天滚动日志文件 -->
+            <fileNamePattern>${LOG_ARCHIVE}/${LOG_FILE}-%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>500MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- 最多保留300天的日志文件 -->
+            <maxHistory>300</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>${FILE_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+    <!-- 根logger的配置 用于开发环境 -->
+    <springProfile name="dev">
+        <root level="${logging.level.root}">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 根logger的配置 用于生产环境 -->
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- 特定包的日志级别配置 -->
+    <logger name="com.example" level="DEBUG"/>
+
+</configuration>

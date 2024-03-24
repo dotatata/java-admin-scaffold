@@ -5,7 +5,6 @@ spring:
 server:
   port: 8080
 
-
 #mybatis:
 #  mapper-locations: classpath:mappers/*.xml  #指定Mybatis的Mapper文件
 #  type-aliases-package: com.jiayun.erp.wms.mybatis.entity #指定Mybatis的实体目录
@@ -19,3 +18,5 @@ mybatis-plus:
 auth-token-expiration: 864000
 #缓存有效期 1 * 24 * 60 * 60
 cache-expiration: 86400
+
+

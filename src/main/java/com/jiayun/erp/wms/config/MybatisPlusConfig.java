@@ -37,7 +37,7 @@ public class MybatisPlusConfig {
             @Override
             public Expression getTenantId() {
                 //System.out.println("CurrentThread.currentUser: " + CurrentThread.currentUser().getUserId());
-                System.out.println("CurrentThread.currentUser: " + CurrentThread.currentUserBySecurityFilter().getUsername());
+                System.out.println("CurrentThread.currentUser: " + CurrentThread.currentUserBySecurityFilterSet().getName());
                 //TODO 先写死租户ID测试
                 return new LongValue(2);
             }

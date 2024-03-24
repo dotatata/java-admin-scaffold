@@ -1,19 +1,20 @@
 package com.jiayun.erp.wms.controller;
 
+import com.jiayun.erp.wms.entity.AuthUser;
 import com.jiayun.erp.wms.entity.Permission;
 import com.jiayun.erp.wms.entity.Role;
 import com.jiayun.erp.wms.entity.User;
-import com.jiayun.erp.wms.mapper.AuthMapper;
 import com.jiayun.erp.wms.mapper.PermissionMapper;
 import com.jiayun.erp.wms.mapper.UserMapper;
+import com.jiayun.erp.wms.util.CurrentThread;
 import com.jiayun.erp.wms.util.JwtUtil;
 import com.jiayun.erp.wms.util.RedisUtil;
 import com.jiayun.erp.wms.util.Res;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,18 +33,14 @@ import java.util.stream.Collectors;
 
 /** Authentication & Authorization **/
 @RestController
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AuthMapper authMapper;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private PermissionMapper permissionMapper;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private RedisUtil redisUtil;
+    private final UserMapper userMapper;
+    private final PermissionMapper permissionMapper;
+    private final AuthenticationManager authenticationManager;
+    private final RedisUtil redisUtil;
+    private final CurrentThread currentThread;
 
     @Order(1)
     @ApiOperation(value = "登录")
@@ -57,26 +53,24 @@ public class AuthController {
         try{
             Authentication authentication = authenticationManager.authenticate(authToken);
             if (authentication != null && authentication.isAuthenticated()){
-                Map<String, String> data = new HashMap<>();
-                //User user = (User)authentication.getPrincipal();
-                User user = authMapper.getUserByPhone(tokenPair.get("username"));
+                // 认证成功 处理需要放到header中的认证token信息
+                AuthUser authUser = (AuthUser)authentication.getPrincipal();
 
-                Map<String, String> userMap = new HashMap<>();
-                userMap.put("uid", user.getId().toString());
-                userMap.put("phone", user.getPhone());
-                userMap.put("name", user.getName());
-                userMap.put("roles", user.getRoles().toString());
+                //构造token中的信息
+                Map<String, Object> userMap = new HashMap<>();
+                userMap.put("uid", authUser.getUser().getId());
+                userMap.put("phone", authUser.getUser().getPhone());
+                userMap.put("name", authUser.getUser().getName());
+                userMap.put("roles", authUser.getUser().getRoles().stream().map(Role::getRoleKey).toArray(String[]::new));
 
                 String token = JwtUtil.createTokenByMap(userMap);
+
                 // 返回认证token 后续访问从header中的"X-token"中获取认证
+                Map<String, String> data = new HashMap<>();
                 data.put("token", token);
 
-                //TODO 暂时使用userId替代vue-element-admin使用的token
-                //data.put("token", user.getPhone());
-
                 // 设置Redis缓存
-                redisUtil.set("user:"+user.getId(), user);
-
+                redisUtil.set(CurrentThread.authUserCacheKey(authUser.getUser().getId()), authUser.getUser());
 
                 return Res.ok("登录成功~~", data);
             }
@@ -95,7 +89,9 @@ public class AuthController {
     @GetMapping("/auth/user-info-by-token")
     public ResponseEntity<Res> getUserInfoByToken(@RequestParam String token){
 
-        User user = userMapper.getUserWithRolesByPhone(token);
+        String phone = currentThread.currentUserByJWT().get("phone").toString();
+
+        User user = userMapper.getUserWithRolesByPhone(phone);
 
         Map<String, Object> data = new HashMap<>();
         data.put("name", user.getName());
@@ -128,7 +124,14 @@ public class AuthController {
     @PostMapping("/auth/logout")
     public ResponseEntity<Res> logout(String token) {
         System.out.println("account logout is: " + token);
-        //TODO 清除Session
+
+
+        //TODO 清除Session: JWT失效、redis删除
+
+        // 删除redis键值
+        int userId = (int) currentThread.currentUserByJWT().get("userId");
+        redisUtil.del(CurrentThread.authUserCacheKey(userId));
+
         return Res.ok("success", null);
     }
 }

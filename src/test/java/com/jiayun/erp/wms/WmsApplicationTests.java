@@ -1,14 +1,21 @@
 package com.jiayun.erp.wms;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.jiayun.erp.wms.entity.Role;
 import com.jiayun.erp.wms.entity.User;
 import com.jiayun.erp.wms.mapper.UserMapper;
+import com.jiayun.erp.wms.util.CurrentThread;
 import com.jiayun.erp.wms.util.JwtUtil;
 import com.jiayun.erp.wms.util.RedisUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +26,8 @@ class WmsApplicationTests {
     RedisUtil redisUtil;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    JsonDeserializer<Timestamp>  customTimestampDeserializer;
 
 
     @Test
@@ -27,13 +36,37 @@ class WmsApplicationTests {
 
     @Test
     void redisTest(){
-        System.out.println("start time: " + System.currentTimeMillis());
-        String key = "user:auth";
-        redisUtil.set(key, 1);
+        User user = userMapper.getUserWithRolesByPhone("13888888888");
 
-        int value = (int) redisUtil.get(key);
-        System.out.println("key '" + key + "' value is " + value);
-        System.out.println("end time: " + System.currentTimeMillis());
+        String userCachedKey = CurrentThread.authUserCacheKey(user.getId());
+        //redisUtil.set(userCachedKey, user);
+
+
+        long startTime = System.currentTimeMillis();
+        System.out.println("start time: " + startTime);
+
+        // 反序列化缓存的User
+        ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(Timestamp.class, customTimestampDeserializer);
+        objectMapper.registerModule(module);
+
+        User cachedUser = objectMapper.convertValue(redisUtil.get(userCachedKey), User.class);
+        System.out.println("cachedUser: " + cachedUser);
+        System.out.println("userId: " + cachedUser.getId());
+        System.out.println("name: " + cachedUser.getName());
+        System.out.println("title: " + cachedUser.getTitle());
+        System.out.println("phone: " + cachedUser.getPhone());
+        System.out.println("createDate: " + cachedUser.getCreateDate());
+        System.out.println("updateDate: " + cachedUser.getUpdateDate());
+        System.out.println("roles: " + cachedUser.getRoles());
+        System.out.println("roleIds: " + Arrays.toString(cachedUser.getRoleIds()));
+
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("end time: " + endTime);
+
+        System.out.println("elapsed: " + (endTime - startTime));
 
     }
 
@@ -44,11 +77,11 @@ class WmsApplicationTests {
         User user = userMapper.getUserWithRolesByPhone("13888888888");
 
 
-        Map<String, String> map = new HashMap<>();
-        map.put("uid", user.getId().toString());
+        Map<String, Object> map = new HashMap<>();
+        map.put("uid", user.getId());
         map.put("phone", user.getPhone());
         map.put("name", user.getName());
-        map.put("roles", user.getRoles().toString());
+        map.put("roles", user.getRoles().stream().map(Role::getRoleKey).toArray(String[]::new));
         //map.put("permissions", user.getName());
 
         String token = JwtUtil.createTokenByMap(map);
@@ -68,7 +101,21 @@ class WmsApplicationTests {
 
 
         System.out.println("end time: " + System.currentTimeMillis());
-
     }
 
+
+    @Test
+    void dbTest(){
+
+        long startTime = System.currentTimeMillis();
+        System.out.println("start time: " + startTime);
+
+        User user = userMapper.getUserById(1);
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("end time: " + startTime);
+
+        System.out.println("elapsed: " + (endTime - startTime));
+
+    }
 }

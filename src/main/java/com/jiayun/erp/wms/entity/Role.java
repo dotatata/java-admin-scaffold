@@ -47,12 +47,22 @@ public class Role {
 
     public Role(){}
 
-    public Role(String name, String description, int[] permissionIds){
+    public Role(String roleKey, String name, String description, int[] permissionIds){
+        this.roleKey = roleKey;
         this.name = name;
         this.description = description;
         this.permissionIds = permissionIds;
     }
 
+    public Role(Integer id, String roleKey, String name, String description, Timestamp createDate, Timestamp updateDate, Timestamp deleteDate) {
+        this.id = id;
+        this.roleKey = roleKey;
+        this.name = name;
+        this.description = description;
+        this.createDate = createDate;
+        this.updateDate = updateDate;
+        this.deleteDate = deleteDate;
+    }
 
     public String getCreateDate() {
         if (createDate != null) {

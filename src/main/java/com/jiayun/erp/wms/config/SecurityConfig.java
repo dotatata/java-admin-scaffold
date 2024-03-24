@@ -1,46 +1,29 @@
 package com.jiayun.erp.wms.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jiayun.erp.wms.filter.AuthenticationTokenFilter;
 import com.jiayun.erp.wms.mapper.UserMapper;
 import com.jiayun.erp.wms.util.Res;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)  // 使用注解进行访问权限鉴权 prePostEnabled=true 支持使用@PreAuthorize
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    AuthenticationTokenFilter authenticationTokenFilter;
-    @Autowired
-    UserMapper userMapper;
-    @Autowired
-    UserDetailsService userDetailsService;
+    private final AuthenticationTokenFilter authenticationTokenFilter;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     @Override

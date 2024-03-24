@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,10 @@ import java.util.Optional;
 
 @Api(value = "权限管理控制器")
 @RestController
+@RequiredArgsConstructor
 public class PermissionController {
 
-    @Autowired
-    private PermissionMapper permissionMapper;
+    private final PermissionMapper permissionMapper;
 
     @Order(1)
     @ApiOperation(value = "获取权限列表(分页)")
