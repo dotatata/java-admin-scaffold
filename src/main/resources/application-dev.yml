@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    name: wms
+    url: jdbc:mysql://localhost:3306/wms?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  devtools:
+    restart:
+      enabled: false  #开发环境热部署
+      additional-paths: src/main/java
+      exclude: static/**
+  #mvc:
+    #static-path-pattern: /** #指定前端访问后台静态资源的位置，默认为/**，需要前端增加路径时，如localhost/img/1.jpg，则配置为/img/**
+  #web:
+    #resources:
+      #static-locations: classpath:/static/  #指定其他静态资源位置
+  servlet:
+    multipart:
+      max-file-size: 10MB #请求中每个文件大小，注：一次请求可以有多个文件
+      max-request-size: 11MB  #每个请求大小
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 10s
+    database: 0
+    lettuce:
+      pool:
+        min-idle: 0
+        max-idle: 8
+    password: 1q2w3e4r
+  cache:
+    redis:
+      cache-null-values: true
+
+upload-dir: /upload-file/
+
+logging:
+  config: classpath:logback-spring.xml  # logback配置文件路径及名称 默认为resource下的logback-spring.xml(即classpath:logback-spring.xml)  #日志级别
+  file:
+    path: logs  #日志文件路径 对应logging-spring.xml中的${LOG_PATH}
+    name: wms.log #日志文件名称 对应logging-spring.xml中的${LOG_FILE}
+  level:
+    root: info  #ERROR WARN INFO DEBUG TRACE
+
+
+
