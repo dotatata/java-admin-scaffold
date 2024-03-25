@@ -6,8 +6,6 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.Optional;
-
 @Data
 public class Res {
 
@@ -24,6 +22,7 @@ public class Res {
         this.data = data;
     }
 
+    // HTTP code 自定义 && 服务正常; Restful eg: 实体创建成功201
     public static ResponseEntity<Res> success(HttpStatus httpStatus, String message, Object data) throws IllegalArgumentException {
         if(httpStatus.is2xxSuccessful()){
             //TODO code枚举改造
@@ -34,7 +33,8 @@ public class Res {
         }
     }
 
-    public static ResponseEntity<Res> failure(HttpStatus httpStatus, String message, Object data) throws IllegalArgumentException {
+    // HTTP code 自定义 && 服务错误
+    public static ResponseEntity<Res> error(HttpStatus httpStatus, String message, Object data) throws IllegalArgumentException {
         if(httpStatus.is5xxServerError() || httpStatus.is4xxClientError()){
             //TODO code枚举改造
             Res res = new Res(50000, message, data);
@@ -44,24 +44,28 @@ public class Res {
         }
     }
 
+    // HTTP code 200 && 服务正常
     public static ResponseEntity<Res> ok(String message, Object data){
         //TODO code枚举改造
         Res res = new Res(20000, message, data);
         return ResponseEntity.ok(res);
     }
 
+    // HTTP code 200 && 服务正常
     public static ResponseEntity<Res> ok(String message){
         return ok(message, null);
     }
 
-    public static ResponseEntity<Res> error(String message, Object data){
+    // HTTP code 200 && 服务失败
+    public static ResponseEntity<Res> failure(String message, Object data){
         //TODO code枚举改造
         Res res = new Res(50000, message, data);
         return ResponseEntity.ok(res);
     }
 
-    public static ResponseEntity<Res> error(String message){
-        return error(message, null);
+    // HTTP code 200 && 服务失败
+    public static ResponseEntity<Res> failure(String message){
+        return failure(message, null);
     }
 
 

@@ -1,4 +1,4 @@
-package com.jiayun.erp.wms.util;
+package com.jiayun.erp.wms.aspect;
 
 
 import java.lang.annotation.*;

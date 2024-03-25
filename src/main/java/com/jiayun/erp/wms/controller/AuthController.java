@@ -75,12 +75,12 @@ public class AuthController {
                 return Res.ok("登录成功~~", data);
             }
         }catch (BadCredentialsException e){
-            return Res.error("登录失败:账号或密码错误!!");
+            return Res.failure("登录失败:账号或密码错误!!");
         }catch (Exception e){
-            return Res.error(e.getMessage());
+            return Res.failure(e.getMessage());
         }
 
-        return Res.failure(HttpStatus.INTERNAL_SERVER_ERROR, "登录服务发生错误", null);
+        return Res.error(HttpStatus.INTERNAL_SERVER_ERROR, "登录服务发生错误", null);
     }
 
     @Order(2)

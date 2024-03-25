@@ -48,4 +48,9 @@ public class TestController {
         System.out.println("get AuthUser from redis: " + currentThread.currentUserByRedis());
         return Res.ok("success", null);
     }
+
+    @GetMapping("/global-exception-test")
+    public ResponseEntity<Res> testGlobalException() throws Exception {
+        throw new Exception("全局异常响应测试");
+    }
 }

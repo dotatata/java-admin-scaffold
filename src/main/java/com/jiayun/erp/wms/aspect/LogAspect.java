@@ -17,7 +17,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LogAspect {
 
-    @Pointcut("execution(* com.jiayun.erp.wms.controller.*.*(..)) || @annotation(com.jiayun.erp.wms.util.Logging)")
+    // 记录控制器请求日志 以及 注解标注的需要记录请求日志的方法调用
+    @Pointcut("execution(* com.jiayun.erp.wms.controller.*.*(..)) || @annotation(com.jiayun.erp.wms.aspect.Logging)")
     public void logging() {}
 
     @Before("logging()")
