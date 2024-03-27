@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -100,6 +102,7 @@ public class UserController {
                         @ApiImplicitParam(name = "phone",value = "电话",required = true),
                         @ApiImplicitParam(name = "pwd",value = "密码",required = true)})
     @PreAuthorize("hasAnyAuthority('user:create')")
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 3, rollbackFor = {Exception.class})
     @PostMapping("/user")
     public ResponseEntity<Res> createUser(@ApiIgnore User user){
         System.out.println(user);
@@ -119,6 +122,7 @@ public class UserController {
                         @ApiImplicitParam(name = "pwd",value = "密码"),
                         @ApiImplicitParam(name = "roleIds",value = "角色ID")})
     @PreAuthorize("hasAnyAuthority('user:create')")
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 3, rollbackFor = {Exception.class})
     @PostMapping("/user/createByJson")
     public ResponseEntity<Res> createUserByJson(@RequestBody User user){
         //TODO 校验电话是否为已删除用户，如果为已删除用户，则更新用户信息，并重新启用
@@ -150,6 +154,7 @@ public class UserController {
                         @ApiImplicitParam(name = "phone",value = "电话",required = true),
                         @ApiImplicitParam(name = "pwd",value = "密码")})
     @PreAuthorize("hasAnyAuthority('user:update')")
+    @Transactional(isolation = Isolation.READ_COMMITTED, timeout = 3, rollbackFor = {Exception.class})
     @PutMapping("/user")
     public ResponseEntity<Res> updateUserByJson(@ApiIgnore @RequestBody User user){
         System.out.println("update user " + user);
@@ -173,6 +178,7 @@ public class UserController {
     @Order(8)
     @ApiOperation(value = "删除用户")
     @PreAuthorize("hasAnyAuthority('user:delete')")
+    @Transactional(isolation = Isolation.READ_COMMITTED, timeout = 3, rollbackFor = {Exception.class})
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<Res> deleteUserById(@PathVariable int userId){
         System.out.println("delete user with id " + userId);
