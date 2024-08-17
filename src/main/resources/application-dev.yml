@@ -1,7 +1,7 @@
 spring:
   datasource:
-    name: wms
-    url: jdbc:mysql://localhost:3306/wms?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true
+    name: scaffold
+    url: jdbc:mysql://localhost:3306/scaffold?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -39,7 +39,7 @@ logging:
   config: classpath:logback-spring.xml  # logback配置文件路径及名称 默认为resource下的logback-spring.xml(即classpath:logback-spring.xml)  #日志级别
   file:
     path: logs  #日志文件路径 对应logging-spring.xml中的${LOG_PATH}
-    name: wms.log #日志文件名称 对应logging-spring.xml中的${LOG_FILE}
+    name: scafflod.log #日志文件名称 对应logging-spring.xml中的${LOG_FILE}
   level:
     root: info  #ERROR WARN INFO DEBUG TRACE
 

@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.jiayun.erp</groupId>
-    <artifactId>wms</artifactId>
+    <groupId>com.zyk.base</groupId>
+    <artifactId>scaffold</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>wms</name>
-    <description>Jiayun group ERP platform WMS</description>
+    <name>scaffold</name>
+    <description>ZYK's base project of scaffold</description>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -150,7 +150,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.jiayun.erp.wms.WmsApplication</mainClass>
+                    <mainClass>com.zyk.base.ScaffoldApplication</mainClass>
                     <skip>true</skip>
                 </configuration>
                 <executions>

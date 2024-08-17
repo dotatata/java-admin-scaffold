@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jiayun.erp.wms.mapper.UserMapper">
-    <resultMap id="userResultMap" type="com.jiayun.erp.wms.entity.User">
+<mapper namespace="com.zyk.base.mapper.UserMapper">
+    <resultMap id="userResultMap" type="com.zyk.base.entity.User">
         <id property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="title" column="title"/>
@@ -9,7 +9,7 @@
         <result property="createDate" column="create_date"/>
         <result property="updateDate" column="update_date"/>
         <!--复合属性映射-->
-        <collection property="roles" ofType="com.jiayun.erp.wms.entity.Role" column="id" select="getRoleByUserId"/>
+        <collection property="roles" ofType="com.zyk.base.entity.Role" column="id" select="getRoleByUserId"/>
     </resultMap>
 
     <select id="getUserWithRoles" parameterType="int" resultMap="userResultMap">
@@ -24,7 +24,7 @@
         SELECT id, `name`, title, phone, pwd, create_date, update_date FROM users WHERE phone = #{phone}
     </select>
 
-    <select id="getRoleByUserId" parameterType="int" resultType="com.jiayun.erp.wms.entity.Role">
+    <select id="getRoleByUserId" parameterType="int" resultType="com.zyk.base.entity.Role">
         SELECT r.*
         FROM user_roles ur
         LEFT JOIN roles r ON ur.role_id = r.id

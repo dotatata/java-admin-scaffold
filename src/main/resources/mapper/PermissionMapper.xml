@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.jiayun.erp.wms.mapper.PermissionMapper">
-    <select id="getPermissionsByRoleIds" parameterType="int[]" resultType="com.jiayun.erp.wms.entity.Permission">
+<mapper namespace="com.zyk.base.mapper.PermissionMapper">
+    <select id="getPermissionsByRoleIds" parameterType="int[]" resultType="com.zyk.base.entity.Permission">
         SELECT distinct p.*
         FROM role_permissions rp
         LEFT JOIN permissions p ON rp.permission_id = p.id
